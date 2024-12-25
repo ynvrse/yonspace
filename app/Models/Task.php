@@ -36,6 +36,8 @@ class Task extends Model
         'is_completed' => 'boolean',
     ];
 
+    protected $with = ['card', 'children', 'user'];
+
     public function card(): BelongsTo
     {
         return $this->belongsTo(Card::class);
@@ -45,4 +47,15 @@ class Task extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Task::class, 'parent_id');
+    }
+    public function children(): HasMany
+    {
+        return $this->hasMany(Task::class, 'parent_id');
+    }
+
+    
 }

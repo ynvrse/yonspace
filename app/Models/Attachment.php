@@ -43,4 +43,6 @@ class Attachment extends Model
     {
         return $this->belongsTo(Card::class);
     }
+
+    
 }

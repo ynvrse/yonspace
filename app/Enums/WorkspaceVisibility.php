@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum WorksapceVisibility: string
+enum WorkspaceVisibility: string
 {
     case PRIVATE = 'Private';
     case PUBLIC = 'Public';
