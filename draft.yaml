@@ -1,1 +1,51 @@
 models:
+    User:
+        name: string
+        email: string
+        username: string nullable
+        password: string
+        avatar: string nullable
+        relationships:
+            hasMany: Workspace, Member, Card, Task, Attachment
+
+    Workspace:
+        user_id: id foreign
+        name: string
+        slug: string
+        cover: string
+        logo: string
+        visibility: string
+        relationships:
+            hasMany: Card
+
+    Member:
+        user_id: id foreign
+        role: string
+        memberable_type: string
+        memberable_id: bigInteger
+
+    Card:
+        user_id: id foreign
+        workspace_id: id foreign
+        title: string
+        description: string nullable
+        deadline: date nullable
+        order: integer
+        status: string
+        priority: string
+        relationships:
+            hasMany: Task, Attachment
+
+    Task:
+        card_id: id foreign
+        user_id: id foreign
+        parent_id: bigInteger
+        title: string
+        is_completed: boolean
+
+    Attachment:
+        user_id: id foreign
+        card_id: id foreign
+        file: string nullable
+        link: string nullable
+        name: string nullable

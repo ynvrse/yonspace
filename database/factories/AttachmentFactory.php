@@ -4,16 +4,18 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use App\Models\Attachment;
+use App\Models\Card;
 use App\Models\User;
 
-class UserFactory extends Factory
+class AttachmentFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = User::class;
+    protected $model = Attachment::class;
 
     /**
      * Define the model's default state.
@@ -21,11 +23,11 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => User::factory(),
+            'card_id' => Card::factory(),
+            'file' => $this->faker->word(),
+            'link' => $this->faker->word(),
             'name' => $this->faker->name(),
-            'email' => $this->faker->safeEmail(),
-            'username' => $this->faker->userName(),
-            'password' => $this->faker->password(),
-            'avatar' => $this->faker->word(),
         ];
     }
 }

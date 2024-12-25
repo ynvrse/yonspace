@@ -1,0 +1,26 @@
+created:
+    - database/factories/UserFactory.php
+    - database/factories/WorkspaceFactory.php
+    - database/factories/MemberFactory.php
+    - database/factories/CardFactory.php
+    - database/factories/TaskFactory.php
+    - database/factories/AttachmentFactory.php
+    - database/migrations/2024_12_25_130233_create_users_table.php
+    - database/migrations/2024_12_25_130234_create_workspaces_table.php
+    - database/migrations/2024_12_25_130235_create_members_table.php
+    - database/migrations/2024_12_25_130236_create_cards_table.php
+    - database/migrations/2024_12_25_130237_create_tasks_table.php
+    - database/migrations/2024_12_25_130238_create_attachments_table.php
+    - app/Models/User.php
+    - app/Models/Workspace.php
+    - app/Models/Member.php
+    - app/Models/Card.php
+    - app/Models/Task.php
+    - app/Models/Attachment.php
+models:
+    User: { name: string, email: string, username: 'string nullable', password: string, avatar: 'string nullable', relationships: { hasMany: 'Workspace, Member, Card, Task, Attachment' } }
+    Workspace: { user_id: 'id foreign', name: string, slug: string, cover: string, logo: string, visibility: string, relationships: { hasMany: Card } }
+    Member: { user_id: 'id foreign', role: string, memberable_type: string, memberable_id: bigInteger }
+    Card: { user_id: 'id foreign', workspace_id: 'id foreign', title: string, description: 'string nullable', deadline: 'date nullable', order: integer, status: string, priority: string, relationships: { hasMany: 'Task, Attachment' } }
+    Task: { card_id: 'id foreign', user_id: 'id foreign', parent_id: bigInteger, title: string, is_completed: boolean }
+    Attachment: { user_id: 'id foreign', card_id: 'id foreign', file: 'string nullable', link: 'string nullable', name: 'string nullable' }
