@@ -18,20 +18,6 @@ class WorkspaceController extends Controller
     use HasFile;
 
 
-    public function create(): Response
-    {
-        return inertia('Workspaces/Create', props: [
-            'page_settings' => [
-                'title' => 'Create Workspace',
-                'subtitle' => 'Fill out this form to add a new workspace',
-                'method' => 'POST',
-                'action' => route('workspaces.store'),
-            ],
-            'visibilities' => WorkspaceVisibility::options(),
-        ]);
-    }
-
-
     public function store(WorkspaceRequest $request): RedirectResponse
     {
 
@@ -51,6 +37,29 @@ class WorkspaceController extends Controller
     {
         return inertia('Workspaces/Show', props: [
             'workspace' => fn() => new WorkspaceResource($workspace),
+            'workspace_settings' => [
+                'title' => 'Edit Workspace',
+                'subtitle' => 'Fill out this form to edit workspace',
+                'method' => 'PUT',
+                'action' => route('workspaces.update', $workspace),
+            ],
+            'visibilities' => WorkspaceVisibility::options(),
+
         ]);
+    }
+
+    public function update(Workspace $workspace, WorkspaceRequest $request): RedirectResponse
+    {
+
+        $workspace->update([
+            'name' => $name = $request->name,
+            'slug' => str()->slug($name . str()->uuid(10)),
+            'logo' =>  $request->hasFile('logo') ? $this->update_file($request, $workspace, 'logo', 'workspaces/logo') : $workspace->logo,
+            'cover' =>  $request->hasFile('cover') ? $this->update_file($request, $workspace, 'cover', 'workspaces/cover') : $workspace->cover,
+
+            'visibility' => $request->visibility,
+        ]);
+        flashMessage('Succesfully updated workspace');
+        return to_route('workspaces.show', $workspace);
     }
 }

@@ -18,7 +18,7 @@ import { useForm, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function WorkspaceDialog() {
+export default function CreateWorkspace() {
     const { workspace_dialog, visibilities } = usePage().props;
     const { data, setData, processing, reset, post } = useForm({
         name: '',

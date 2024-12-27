@@ -1,6 +1,6 @@
 import { Folder, Forward, MoreHorizontal, Trash2 } from 'lucide-react';
 
-import WorkspaceDialog from '@/Components/FormDialog/WorkspaceDialog';
+import CreateWorkspace from '@/Components/FormDialog/CreateWorkspace';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import {
     DropdownMenu,
@@ -26,13 +26,12 @@ export function NavProjects({ projects }) {
     const parts = pathname.split('/');
     const slug = parts[parts.length - 1];
 
-    console.log(slug);
     return (
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <div className="flex items-center justify-between">
                 <SidebarGroupLabel>Workspace</SidebarGroupLabel>
 
-                <WorkspaceDialog />
+                <CreateWorkspace />
             </div>
             <SidebarMenu>
                 {projects.map((item) => {
@@ -40,7 +39,7 @@ export function NavProjects({ projects }) {
                     return (
                         <SidebarMenuItem key={item.id}>
                             <SidebarMenuButton asChild isActive={isActive}>
-                                <Link href={'/workspaces/p/' + item.slug}>
+                                <Link href={route('workspaces.show', item.slug)} key={item.slug}>
                                     <Avatar className="h-7 w-7 rounded-sm">
                                         <AvatarImage src={item.logo} alt={item.name} />
                                         <AvatarFallback className="rounded-sm bg-lime-200 text-xs font-bold">
