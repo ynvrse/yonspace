@@ -1,50 +1,34 @@
 'use client';
-
-import { ChevronRight } from 'lucide-react';
-
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/resources/js/Components/ui/collapsible';
-import {
-    SidebarGroup,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
-} from '@/resources/js/Components/ui/sidebar';
+import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/Components/ui/sidebar';
+import { Link } from '@inertiajs/react';
+import { LogOut } from 'lucide-react';
 
 export function NavMain({ items }) {
+    const { pathname } = window.location;
     return (
         <SidebarGroup>
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
             <SidebarMenu>
-                {items.map((item) => (
-                    <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
-                        <SidebarMenuItem>
-                            <CollapsibleTrigger asChild>
-                                <SidebarMenuButton tooltip={item.title}>
+                {items.map((item) => {
+                    const isActive = pathname === item.url;
+                    return (
+                        <Link href={item.url} key={item.title}>
+                            <SidebarMenuItem asChild>
+                                <SidebarMenuButton isActive={isActive} variant="lime" tooltip={item.title}>
                                     {item.icon && <item.icon />}
                                     <span>{item.title}</span>
-                                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                 </SidebarMenuButton>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent>
-                                <SidebarMenuSub>
-                                    {item.items?.map((subItem) => (
-                                        <SidebarMenuSubItem key={subItem.title}>
-                                            <SidebarMenuSubButton asChild>
-                                                <a href={subItem.url}>
-                                                    <span>{subItem.title}</span>
-                                                </a>
-                                            </SidebarMenuSubButton>
-                                        </SidebarMenuSubItem>
-                                    ))}
-                                </SidebarMenuSub>
-                            </CollapsibleContent>
-                        </SidebarMenuItem>
-                    </Collapsible>
-                ))}
+                            </SidebarMenuItem>
+                        </Link>
+                    );
+                })}
+                <Link method="post" href={route('logout')} as="button" key="logout">
+                    <SidebarMenuItem>
+                        <SidebarMenuButton tooltip="Log Out">
+                            <LogOut />
+                            <span>Log Out</span>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </Link>
             </SidebarMenu>
         </SidebarGroup>
     );

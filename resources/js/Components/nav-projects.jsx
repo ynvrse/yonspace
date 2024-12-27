@@ -1,12 +1,14 @@
 import { Folder, Forward, MoreHorizontal, Trash2 } from 'lucide-react';
 
+import WorkspaceDialog from '@/Components/FormDialog/WorkspaceDialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/resources/js/Components/ui/dropdown-menu';
+} from '@/Components/ui/dropdown-menu';
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -15,52 +17,70 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     useSidebar,
-} from '@/resources/js/Components/ui/sidebar';
-
+} from '@/Components/ui/sidebar';
+import { getAvatarFallback } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
 export function NavProjects({ projects }) {
     const { isMobile } = useSidebar();
+    const { pathname } = window.location;
+    const parts = pathname.split('/');
+    const slug = parts[parts.length - 1];
 
+    console.log(slug);
     return (
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-            <SidebarGroupLabel>Projects</SidebarGroupLabel>
+            <div className="flex items-center justify-between">
+                <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+
+                <WorkspaceDialog />
+            </div>
             <SidebarMenu>
-                {projects.map((item) => (
-                    <SidebarMenuItem key={item.name}>
-                        <SidebarMenuButton asChild>
-                            <a href={item.url}>
-                                <item.icon />
-                                <span>{item.name}</span>
-                            </a>
-                        </SidebarMenuButton>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuAction showOnHover>
-                                    <MoreHorizontal />
-                                    <span className="sr-only">More</span>
-                                </SidebarMenuAction>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                className="w-48 rounded-lg"
-                                side={isMobile ? 'bottom' : 'right'}
-                                align={isMobile ? 'end' : 'start'}
-                            >
-                                <DropdownMenuItem>
-                                    <Folder className="text-muted-foreground" />
-                                    <span>View Project</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Forward className="text-muted-foreground" />
-                                    <span>Share Project</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <Trash2 className="text-muted-foreground" />
-                                    <span>Delete Project</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </SidebarMenuItem>
-                ))}
+                {projects.map((item) => {
+                    const isActive = slug === item.slug;
+                    return (
+                        <SidebarMenuItem key={item.id}>
+                            <SidebarMenuButton asChild isActive={isActive}>
+                                <Link href={'/workspaces/p/' + item.slug}>
+                                    <Avatar className="h-7 w-7 rounded-sm">
+                                        <AvatarImage src={item.logo} alt={item.name} />
+                                        <AvatarFallback className="rounded-sm bg-lime-200 text-xs font-bold">
+                                            {getAvatarFallback(item.name)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <span>{item.name}</span>
+                                </Link>
+                            </SidebarMenuButton>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <SidebarMenuAction showOnHover>
+                                        <MoreHorizontal />
+                                        <span className="sr-only">More</span>
+                                    </SidebarMenuAction>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                    className="w-48 rounded-lg"
+                                    side={isMobile ? 'bottom' : 'right'}
+                                    align={isMobile ? 'end' : 'start'}
+                                >
+                                    <DropdownMenuItem>
+                                        <Folder className="text-muted-foreground" />
+                                        <span>View Project</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <Forward className="text-muted-foreground" />
+                                        <span>Share Project</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem>
+                                        <Trash2 className="text-muted-foreground" />
+                                        <span>Delete Project</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </SidebarMenuItem>
+                    );
+                })}
+
                 <SidebarMenuItem>
                     <SidebarMenuButton className="text-sidebar-foreground/70">
                         <MoreHorizontal className="text-sidebar-foreground/70" />
