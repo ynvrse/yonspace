@@ -15,6 +15,20 @@ class WorkspaceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
+        $members = $this->members()->get();
+
+        $membersData = $members->map(function ($member) {
+            return [
+                'id' => $member->id,
+                'memberable_id' => $member->memberable_id,
+                'role' => $member->role,
+                'name' => $member->user->name,
+                'email' => $member->user->email,
+                'avatar' => $member->user->avatar,
+            ];
+        });
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -22,6 +36,7 @@ class WorkspaceResource extends JsonResource
             'logo' => Storage::url($this->logo),
             'cover' => Storage::url($this->cover),
             'visibility' => $this->visibility->value,
+            'members' => $membersData,
         ];
     }
 }

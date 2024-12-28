@@ -8,6 +8,7 @@ use App\Enums\WorkspaceVisibility;
 use App\Http\Requests\WorkspaceRequest;
 use App\Http\Resources\MemberWorkspaceResource;
 use App\Http\Resources\WorkspaceResource;
+use App\Models\Member;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Traits\HasFile;
@@ -46,10 +47,8 @@ class WorkspaceController extends Controller
     {
         $members = $workspace->members()->get();
 
-
         return inertia('Workspaces/Show', props: [
-            'members' => MemberWorkspaceResource::collection($members)->values(),
-            'workspace' => fn() => new WorkspaceResource($workspace),
+            'workspace' => fn() => new WorkspaceResource($workspace->load('members')),
             'workspace_settings' => [
                 'title' => 'Edit Workspace',
                 'subtitle' => 'Fill out this form to edit workspace',
@@ -102,7 +101,6 @@ class WorkspaceController extends Controller
             return back();
         }
 
-
         if ($workspace->members()->where('user_id', $user->id)->exists()) {
             flashMessage('User is alredy a member of this workspace', 'error');
             return back();
@@ -113,6 +111,14 @@ class WorkspaceController extends Controller
             'role' => 'Member',
         ]);
         flashMessage('Member succesfuly invited');
+        return back();
+    }
+    public function member_destroy(Workspace $workspace, Member $member): RedirectResponse
+    {
+
+        $member->delete();
+
+        flashMessage('Member succesfuly deleted');
         return back();
     }
 }

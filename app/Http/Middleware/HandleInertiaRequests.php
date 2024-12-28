@@ -40,18 +40,8 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user() ? new UserSingleResource($request->user()) : null,
             ],
             'workspaces' => fn() => $request->user()
-                ? WorksapceSidebarResource::collection(
-                    Workspace::where('user_id', $request->user()->id)
-                        ->orWhereHas(
-                            'members',
-                            fn($query) =>
-                            $query->where('user_id', $request->user()->id)
-                        )
-                        ->get()
-                )
+                ? WorksapceSidebarResource::collection($this->getWorkspaceSidebar($request->user()))
                 : null,
-
-
             'flash_message' => fn() => [
                 'type' => $request->session()->get('type'),
                 'message' => $request->session()->get('message'),
@@ -75,5 +65,18 @@ class HandleInertiaRequests extends Middleware
             'method' => 'POST',
             'action' => route('workspaces.store'),
         ];
+    }
+
+    private function getWorkspaceSidebar($requestUser)
+    {
+        $sidebarShow = Workspace::where('user_id', $requestUser->id)
+            ->orWhereHas(
+                'members',
+                fn($query) =>
+                $query->where('user_id', $requestUser->id)
+            )
+            ->get();
+
+        return $sidebarShow;
     }
 }

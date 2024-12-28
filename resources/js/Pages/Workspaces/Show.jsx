@@ -8,8 +8,7 @@ import { Link } from '@inertiajs/react';
 import { Settings, UsersRound } from 'lucide-react';
 
 export default function Show({ ...props }) {
-    const { workspace, workspace_settings, visibilities, members, member_dialog } = props;
-    console.log(members);
+    const { workspace, workspace_settings, visibilities, member_dialog } = props;
     const membersxz = [
         {
             name: 'John Doe',
@@ -80,7 +79,11 @@ export default function Show({ ...props }) {
                                 Create Card
                             </Link>
 
-                            <MemberWorkspace workspace={workspace.name} member_dialog={member_dialog} members={members}>
+                            <MemberWorkspace
+                                workspace={workspace.name}
+                                member_dialog={member_dialog}
+                                members={workspace.members}
+                            >
                                 <div className="inine-flex items-cener transition-color whitespace-nowarp justify-center rounded-md text-sm font-medium text-foreground ring-offset-background hover:font-bold hover:text-lime-500 hover:no-underline hover:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
                                     <UsersRound size={18} />
                                 </div>

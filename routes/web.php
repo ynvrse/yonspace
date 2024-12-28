@@ -25,7 +25,7 @@ Route::controller(WorkspaceController::class)->group(function () {
     Route::delete('workspaces/destroy/{workspace:slug}', 'destroy')->name('workspaces.destroy');
 
     Route::post('workspaces/member/{workspace:slug}/store', 'member_store')->name('workspaces.member_store');
-    Route::delete('workspaces/member/{workspace:slug}/destroy', 'member_destroy')->name('workspaces.member_destroy');
+    Route::delete('workspaces/member/{workspace}/destroy/{member}', 'member_destroy')->name('workspaces.member_destroy');
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');

@@ -15,7 +15,8 @@ class MemberWorkspaceResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-
+            'id' => $this->user->id,
+            'memberable_id' => $this->user->memberable_id,
             'name' => $this->user->name,
             'avatar' => $this->user->avatar,
 
