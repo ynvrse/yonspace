@@ -27,7 +27,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import InputDesc from '@/Components/InputDesc';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
-import { flashMessage } from '@/lib/utils';
+import { handleFlashMessage } from '@/lib/utils';
 import { router, useForm } from '@inertiajs/react';
 
 import { X } from 'lucide-react';
@@ -55,18 +55,7 @@ export default function MemberWorkspace({ children, workspace, members, member_d
         e.preventDefault();
 
         post(member_dialog.action, {
-            onSuccess: (success) => {
-                const flash = flashMessage(success);
-                if (flash) toast[flash.type](flash.message);
-                reset();
-            },
-            onError: (errors) => {
-                if (errors) {
-                    Object.entries(errors).forEach(([key, message]) => {
-                        toast.error(message);
-                    });
-                }
-            },
+            ...handleFlashMessage(reset),
             preserveScroll: true,
             preserveState: true,
         });
@@ -136,21 +125,21 @@ export default function MemberWorkspace({ children, workspace, members, member_d
                                                             <AvatarFallback>{member.name?.charAt(0)}</AvatarFallback>
                                                         </Avatar>
                                                     </TooltipTrigger>
-                                                    <TooltipContent>
+                                                    <TooltipContent className="bg-gray-900">
                                                         <div className="flex items-center justify-between gap-x-2">
                                                             <p>{member.name}</p>
-                                                            {console.log(member)}
-                                                            <AlertDialog>
+                                                            <AlertDialog >
                                                                 {member.role === 'Member' ? (
-                                                                    <AlertDialogTrigger>
+                                                                    <AlertDialogTrigger className='bg-gray-800 p-1 rounded-md'>
                                                                         <X
+                                                                            strokeWidth={5}
                                                                             color="red"
                                                                             size={14}
                                                                             className="cursor-pointer"
                                                                         />
                                                                     </AlertDialogTrigger>
                                                                 ) : (
-                                                                    '| Owner'
+                                                                    <p>| <span className='text-lime-400'>Owner</span></p>
                                                                 )}
                                                                 <AlertDialogContent>
                                                                     <AlertDialogHeader>
@@ -173,36 +162,13 @@ export default function MemberWorkspace({ children, workspace, members, member_d
                                                                                         member: member.id,
                                                                                     }),
                                                                                     {
-                                                                                        onSuccess: (success) => {
-                                                                                            const flash =
-                                                                                                flashMessage(success);
-                                                                                            if (flash)
-                                                                                                toast[flash.type](
-                                                                                                    flash.message,
-                                                                                                );
-                                                                                            reset();
-                                                                                        },
-                                                                                        onError: (errors) => {
-                                                                                            if (errors) {
-                                                                                                Object.entries(
-                                                                                                    errors,
-                                                                                                ).forEach(
-                                                                                                    ([
-                                                                                                        key,
-                                                                                                        message,
-                                                                                                    ]) => {
-                                                                                                        toast.error(
-                                                                                                            message,
-                                                                                                        );
-                                                                                                    },
-                                                                                                );
-                                                                                            }
-                                                                                        },
+                                                                                        ...handleFlashMessage(reset), 
                                                                                         preserveScroll: true,
                                                                                         preserveState: true,
                                                                                     },
                                                                                 )
                                                                             }
+                                                                            
                                                                         >
                                                                             Continue
                                                                         </AlertDialogAction>

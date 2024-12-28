@@ -81,6 +81,17 @@ class WorkspaceController extends Controller
         flashMessage('Succesfully updated workspace');
         return to_route('workspaces.show', $workspace);
     }
+    public function destroy(Workspace $workspace,): RedirectResponse
+    {
+
+        $this->delete_file($workspace, 'logo');
+        $this->delete_file($workspace, 'cover');
+
+        $workspace->members()->delete();
+        $workspace->delete();
+        flashMessage('Workspace successfuly deleted');
+        return to_route('dashboard');
+    }
 
 
     public function member_store(Workspace $workspace, Request $request): RedirectResponse

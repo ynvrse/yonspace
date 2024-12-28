@@ -18,9 +18,9 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/Components/ui/sidebar';
-import { getAvatarFallback } from '@/lib/utils';
-import { Link } from '@inertiajs/react';
-export function NavProjects({ projects }) {
+import { getAvatarFallback, handleFlashMessage } from '@/lib/utils';
+import { Link, router } from '@inertiajs/react';
+export function NavWorkspaces({ workspaces }) {
     const { isMobile } = useSidebar();
     const { pathname } = window.location;
     const parts = pathname.split('/');
@@ -34,12 +34,12 @@ export function NavProjects({ projects }) {
                 <CreateWorkspace />
             </div>
             <SidebarMenu>
-                {projects.map((item) => {
+                {workspaces.map((item) => {
                     const isActive = slug === item.slug;
                     return (
                         <SidebarMenuItem key={item.id}>
                             <SidebarMenuButton asChild isActive={isActive}>
-                                <Link href={route('workspaces.show', item.slug)} key={item.slug}>
+                                <Link href={route('workspaces.show', item.slug)} >
                                     <Avatar className="h-7 w-7 rounded-sm">
                                         <AvatarImage src={item.logo} alt={item.name} />
                                         <AvatarFallback className="rounded-sm bg-lime-200 text-xs font-bold">
@@ -62,17 +62,33 @@ export function NavProjects({ projects }) {
                                     align={isMobile ? 'end' : 'start'}
                                 >
                                     <DropdownMenuItem>
-                                        <Folder className="text-muted-foreground" />
-                                        <span>View Project</span>
+                                        <Link href={route('workspaces.show', item.slug)} className='flex gap-x-2'>
+                                        <Folder size={16} className="text-muted-foreground" />
+                                        <span>View Workspace</span>
+                                        </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
                                         <Forward className="text-muted-foreground" />
-                                        <span>Share Project</span>
+                                        <span>Share Workspace</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                    onClick={() =>
+                                        router.delete(
+                                            route('workspaces.destroy', {
+                                                workspace: item.slug,
+
+                                            }),
+                                            {
+                                                ...handleFlashMessage(), 
+                                                preserveScroll: true,
+                                                preserveState: true,
+                                            },
+                                        )
+                                    }
+                                    >
                                         <Trash2 className="text-muted-foreground" />
-                                        <span>Delete Project</span>
+                                        <span>Delete Workspace</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
