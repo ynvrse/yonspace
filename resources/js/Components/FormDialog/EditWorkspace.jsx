@@ -18,9 +18,7 @@ import { useForm } from '@inertiajs/react';
 
 import { toast } from 'sonner';
 
-export default function EditWorkspace({ children, ...props }) {
-    const { workspace, workspace_settings, visibilities } = props;
-
+export default function EditWorkspace({ children, workspace, workspace_settings, visibilities }) {
     const { data, setData, processing, reset, post } = useForm({
         name: workspace.name,
         logo: null,
@@ -140,7 +138,7 @@ export default function EditWorkspace({ children, ...props }) {
                                             variant="lime"
                                             className="w-full md:w-auto"
                                         >
-                                            Create Workspace
+                                            Save
                                         </Button>
                                     </DialogClose>
                                 </div>

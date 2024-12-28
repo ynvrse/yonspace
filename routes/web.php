@@ -16,7 +16,7 @@ Route::get('/', function () {
     ]);
 });
 
-Route::controller(WorkspaceController::class)->group( function(){
+Route::controller(WorkspaceController::class)->group(function () {
     Route::get('workspaces/create', 'create')->name('workspaces.create');
     Route::post('', 'store')->name('workspaces.store');
     Route::get('workspaces/p/{workspace:slug}', 'show')->name('workspaces.show');
@@ -24,6 +24,8 @@ Route::controller(WorkspaceController::class)->group( function(){
     Route::put('workspaces/edit/{workspace:slug}', 'update')->name('workspaces.update');
     Route::delete('workspaces/destroy/{workspace:slug}', 'destroy')->name('workspaces.destroy');
 
+    Route::post('workspaces/member/{workspace:slug}/store', 'member_store')->name('workspaces.member_store');
+    Route::delete('workspaces/member/{workspace:slug}/destroy', 'member_destroy')->name('workspaces.member_destroy');
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
@@ -34,4 +36,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -39,9 +39,19 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user() ? new UserSingleResource($request->user()) : null,
             ],
-            'workspaces' => fn() => $request->user() ? WorksapceSidebarResource::collection(
-                Workspace::find($request->user()->id)->get()
-            ) : null,
+            'workspaces' => fn() => $request->user()
+                ? WorksapceSidebarResource::collection(
+                    Workspace::where('user_id', $request->user()->id)
+                        ->orWhereHas(
+                            'members',
+                            fn($query) =>
+                            $query->where('user_id', $request->user()->id)
+                        )
+                        ->get()
+                )
+                : null,
+
+
             'flash_message' => fn() => [
                 'type' => $request->session()->get('type'),
                 'message' => $request->session()->get('message'),
