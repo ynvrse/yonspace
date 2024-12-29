@@ -1,13 +1,13 @@
-import { AudioWaveform, Command, Frame, GalleryVerticalEnd, Home, ListTodo, Map, PieChart, User2 } from 'lucide-react';
+import { Home, ListTodo, User2 } from 'lucide-react';
 
 import { NavMain } from '@/Components/nav-main';
-import { NavWorkspaces } from '@/Components/nav-workspace';
 import { NavUser } from '@/Components/nav-user';
+import { NavWorkspaces } from '@/Components/nav-workspace';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/Components/ui/sidebar';
 import { usePage } from '@inertiajs/react';
 import NavIcon from './nav-icon';
 
-const  navMain = [
+const navMain = [
     {
         title: 'Dashboard',
         url: '/dashboard',
@@ -24,7 +24,7 @@ const  navMain = [
         url: '/task',
         icon: ListTodo,
     },
-]
+];
 
 export function AppSidebar({ ...props }) {
     const user = usePage().props.auth.user;

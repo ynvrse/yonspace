@@ -22,24 +22,23 @@ export default function Show({ ...props }) {
             <div className="px-2 sm:px-4">
                 <div className="-mt-12 sm:items-center sm:space-x-5">
                     <div className="flex justify-between">
-                        <div className='flex items-center gap-x-3'>
-                        <Avatar className="h-24 w-24 rounded-full ring-4 ring-white">
-                            <AvatarImage src={workspace.logo} alt={'logo-' + workspace.name} />
-                            <AvatarFallback className="rounded-full">
-                                {getAvatarFallback(workspace.name)}
-                            </AvatarFallback>
-                        </Avatar>
-                        <div className="hidden  md:block lg:block">
-                            <CardTitle className="text-4xl  leading-relaxed tracking-tighter">
-                                {workspace.name}
-                            </CardTitle>
+                        <div className="flex items-center gap-x-3">
+                            <Avatar className="h-24 w-24 rounded-full ring-4 ring-white">
+                                <AvatarImage src={workspace.logo} alt={'logo-' + workspace.name} />
+                                <AvatarFallback className="rounded-full">
+                                    {getAvatarFallback(workspace.name)}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="hidden md:block lg:block">
+                                <CardTitle className="text-4xl leading-relaxed tracking-tighter">
+                                    {workspace.name}
+                                </CardTitle>
                             </div>
-                            
                         </div>
-                        
-                        <div className="md:mt-2 flex items-center  gap-x-4">
+
+                        <div className="flex items-center gap-x-4 md:mt-2">
                             <Link
-                                href="#"
+                                href={route('cards.create', [workspace.slug])}
                                 className="inine-flex items-cener transition-color whitespace-nowarp justify-center rounded-md text-sm font-medium text-foreground ring-offset-background hover:font-bold hover:text-lime-500 hover:no-underline hover:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
                             >
                                 Create Card
@@ -67,16 +66,9 @@ export default function Show({ ...props }) {
                         </div>
                     </div>
 
-                            <div className="md:hidden">
-                            <CardTitle className="text-2xl  leading-relaxed tracking-tighter">
-                                {workspace.name}
-                            </CardTitle>
-                            </div>
-
-
-                        
-                        
-
+                    <div className="md:hidden">
+                        <CardTitle className="text-2xl leading-relaxed tracking-tighter">{workspace.name}</CardTitle>
+                    </div>
                 </div>
             </div>
         </>

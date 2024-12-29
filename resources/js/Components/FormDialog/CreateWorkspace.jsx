@@ -13,10 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import InputDesc from '@/Components/InputDesc';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
-import { flashMessage } from '@/lib/utils';
+import { handleFlashMessage } from '@/lib/utils';
 import { useForm, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-import { toast } from 'sonner';
 
 export default function CreateWorkspace() {
     const { workspace_dialog, visibilities } = usePage().props;
@@ -32,18 +31,7 @@ export default function CreateWorkspace() {
         e.preventDefault();
 
         post(workspace_dialog.action, {
-            onSuccess: (success) => {
-                const flash = flashMessage(success);
-                if (flash) toast[flash.type](flash.message);
-            },
-            onError: (errors) => {
-                if (errors) {
-                    Object.entries(errors).forEach(([key, message]) => {
-                        console.log(message);
-                        toast.error(message);
-                    });
-                }
-            },
+            ...handleFlashMessage(reset),
             preserveScroll: true,
             preserveState: true,
         });

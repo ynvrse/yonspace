@@ -39,7 +39,7 @@ export function NavWorkspaces({ workspaces }) {
                     return (
                         <SidebarMenuItem key={item.id}>
                             <SidebarMenuButton asChild isActive={isActive}>
-                                <Link href={route('workspaces.show', item.slug)} >
+                                <Link href={route('workspaces.show', item.slug)}>
                                     <Avatar className="h-7 w-7 rounded-sm">
                                         <AvatarImage src={item.logo} alt={item.name} />
                                         <AvatarFallback className="rounded-sm bg-lime-200 text-xs font-bold">
@@ -62,9 +62,9 @@ export function NavWorkspaces({ workspaces }) {
                                     align={isMobile ? 'end' : 'start'}
                                 >
                                     <DropdownMenuItem>
-                                        <Link href={route('workspaces.show', item.slug)} className='flex gap-x-2'>
-                                        <Folder size={16} className="text-muted-foreground" />
-                                        <span>View Workspace</span>
+                                        <Link href={route('workspaces.show', item.slug)} className="flex gap-x-2">
+                                            <Folder size={16} className="text-muted-foreground" />
+                                            <span>View Workspace</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
@@ -72,20 +72,19 @@ export function NavWorkspaces({ workspaces }) {
                                         <span>Share Workspace</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem 
-                                    onClick={() =>
-                                        router.delete(
-                                            route('workspaces.destroy', {
-                                                workspace: item.slug,
-
-                                            }),
-                                            {
-                                                ...handleFlashMessage(), 
-                                                preserveScroll: true,
-                                                preserveState: true,
-                                            },
-                                        )
-                                    }
+                                    <DropdownMenuItem
+                                        onClick={() =>
+                                            router.delete(
+                                                route('workspaces.destroy', {
+                                                    workspace: item.slug,
+                                                }),
+                                                {
+                                                    ...handleFlashMessage(),
+                                                    preserveScroll: true,
+                                                    preserveState: true,
+                                                },
+                                            )
+                                        }
                                     >
                                         <Trash2 className="text-muted-foreground" />
                                         <span>Delete Workspace</span>

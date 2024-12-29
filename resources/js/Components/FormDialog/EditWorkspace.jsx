@@ -13,10 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import InputDesc from '@/Components/InputDesc';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
-import { flashMessage } from '@/lib/utils';
+import { handleFlashMessage } from '@/lib/utils';
 import { useForm } from '@inertiajs/react';
-
-import { toast } from 'sonner';
 
 export default function EditWorkspace({ children, workspace, workspace_settings, visibilities }) {
     const { data, setData, processing, reset, post } = useForm({
@@ -31,17 +29,7 @@ export default function EditWorkspace({ children, workspace, workspace_settings,
         e.preventDefault();
 
         post(workspace_settings.action, {
-            onSuccess: (success) => {
-                const flash = flashMessage(success);
-                if (flash) toast[flash.type](flash.message);
-            },
-            onError: (errors) => {
-                if (errors) {
-                    Object.entries(errors).forEach(([key, message]) => {
-                        toast.error(message);
-                    });
-                }
-            },
+            ...handleFlashMessage(reset),
             preserveScroll: true,
             preserveState: true,
         });

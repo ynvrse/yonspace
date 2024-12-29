@@ -32,7 +32,6 @@ import { router, useForm } from '@inertiajs/react';
 
 import { X } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 export default function MemberWorkspace({ children, workspace, members, member_dialog }) {
     const [memberLength, setMemberLength] = useState(3);
@@ -128,9 +127,9 @@ export default function MemberWorkspace({ children, workspace, members, member_d
                                                     <TooltipContent className="bg-gray-900">
                                                         <div className="flex items-center justify-between gap-x-2">
                                                             <p>{member.name}</p>
-                                                            <AlertDialog >
+                                                            <AlertDialog>
                                                                 {member.role === 'Member' ? (
-                                                                    <AlertDialogTrigger className='bg-gray-800 p-1 rounded-md'>
+                                                                    <AlertDialogTrigger className="rounded-md bg-gray-800 p-1">
                                                                         <X
                                                                             strokeWidth={5}
                                                                             color="red"
@@ -139,7 +138,9 @@ export default function MemberWorkspace({ children, workspace, members, member_d
                                                                         />
                                                                     </AlertDialogTrigger>
                                                                 ) : (
-                                                                    <p>| <span className='text-lime-400'>Owner</span></p>
+                                                                    <p>
+                                                                        | <span className="text-lime-400">Owner</span>
+                                                                    </p>
                                                                 )}
                                                                 <AlertDialogContent>
                                                                     <AlertDialogHeader>
@@ -162,13 +163,12 @@ export default function MemberWorkspace({ children, workspace, members, member_d
                                                                                         member: member.id,
                                                                                     }),
                                                                                     {
-                                                                                        ...handleFlashMessage(reset), 
+                                                                                        ...handleFlashMessage(reset),
                                                                                         preserveScroll: true,
                                                                                         preserveState: true,
                                                                                     },
                                                                                 )
                                                                             }
-                                                                            
                                                                         >
                                                                             Continue
                                                                         </AlertDialogAction>
