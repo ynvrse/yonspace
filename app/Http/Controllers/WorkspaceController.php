@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CardStatus;
 use Illuminate\Http\Request;
 use Inertia\Response;
 use App\Enums\WorkspaceVisibility;
 use App\Http\Requests\WorkspaceRequest;
-use App\Http\Resources\MemberWorkspaceResource;
+use App\Http\Resources\CardResource;
 use App\Http\Resources\WorkspaceResource;
 use App\Models\Member;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Traits\HasFile;
-use Exception;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Redirect;
 
 class WorkspaceController extends Controller
 {
@@ -45,9 +44,19 @@ class WorkspaceController extends Controller
 
     public function show(Workspace $workspace): Response
     {
-        $members = $workspace->members()->get();
+
 
         return inertia('Workspaces/Show', props: [
+            'cards' => fn() => CardResource::collection($workspace->load([
+                'cards' => fn($q) => $q->withCount(['tasks', 'members', 'attachments'])->with([
+                    'attachments',
+                    'members',
+                    'tasks' => fn($task) => $task->withCount('children'),
+                ])->orderBy('order')
+            ])->cards),
+
+            'statuses' => fn() => CardStatus::options(),
+
             'workspace' => fn() => new WorkspaceResource($workspace->load('members')),
             'workspace_settings' => [
                 'title' => 'Edit Workspace',

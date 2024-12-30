@@ -1,14 +1,17 @@
 import EditWorkspace from '@/Components/FormDialog/EditWorkspace';
 import MemberWorkspace from '@/Components/FormDialog/MemberWorkspace';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
-import { CardTitle } from '@/Components/ui/card';
+import { Card, CardHeader, CardTitle } from '@/Components/ui/card';
 import AppLayout from '@/Layouts/AppLayout';
 import { getAvatarFallback } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
-import { Settings, UsersRound } from 'lucide-react';
+import { Plus, Settings, UsersRound } from 'lucide-react';
 
 export default function Show({ ...props }) {
-    const { workspace, workspace_settings, visibilities, member_dialog } = props;
+    const { workspace, workspace_settings, cards, statuses, visibilities, member_dialog } = props;
+
+
+    
 
     return (
         <>
@@ -69,8 +72,50 @@ export default function Show({ ...props }) {
                     <div className="md:hidden">
                         <CardTitle className="text-2xl leading-relaxed tracking-tighter">{workspace.name}</CardTitle>
                     </div>
+
+                    
                 </div>
             </div>
+                <div className="flex flex-col justify-start w-full mt-2 gap-x-5 gap-y-8 sm:flex-row">
+                {statuses.map((status,index)=>(
+                            <div className="w-full space-y-4 sm:w-1/4" key={index}>
+                                <div className="flex items-center justify-between">
+                                    <span className='text-base font-semibold leading-relaxed tracking-tighter'>{status.value}</span>
+                                    <div className="flex items-center gap-x-3">
+                                        <Link href={route('cards.create',{
+                                            workspace: workspace,
+                                            _query: {
+                                                status: status.value,
+                                            }
+                                        })}>
+                                            <Plus size={14} />
+                                        </Link>
+                                    </div>
+                                </div>
+                                {/* column card container */}
+                                <div className="flex flex-col flex-grow gap-4 p-2 overflow-x-hidden overflow-y-auto">
+                                    {cards.filter((card) => card.status == status.value).map((card,index)=>(
+                                        <Card key={index}
+                                        className='relative rounded-xl hover:ring-2 hover:ring-inset hover:ring-lime-400'
+                                        >
+                                        <CardHeader>
+                                            <div className="flex items-center justify-between">
+                                                <CardTitle className='text-base leading-relaxed tracking-tighter line-clamp-2'>
+                                                    <Link href={route('cards.show', [workspace, card])}
+                                                        className='hover:text-lime-500'
+                                                    >
+                                                        {card.title}
+                                                    </Link>
+                                                </CardTitle>
+                                            </div>
+                                        </CardHeader>
+                                        </Card>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
         </>
     );
 }

@@ -8,22 +8,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/Layouts/AppLayout';
 import { handleFlashMessage } from '@/lib/utils';
 import { Transition } from '@headlessui/react';
-import { Link, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
-export default function Create({ page_settings, statuses,status, priorities, workspace }) {
- 
-
-    
-
+export default function Edit({ page_settings, statuses, priorities, workspace,card }) {
     const { data, setData, processing, reset, post, errors, recentlySuccessful } = useForm({
         title: '',
         description: '',
         deadline: null,
-        status: status,
+        status: 'To Do',
         priority: 'Unknown',
         _method: page_settings.method,
     });
+
+
 
     const onHandleChange = (e) => {
         setData(e.target.name, e.target.value);
@@ -36,6 +34,7 @@ export default function Create({ page_settings, statuses,status, priorities, wor
             page_settings.action,
             {
                 workspace: workspace.slug,
+                card: card
             },
             {
                 ...handleFlashMessage(reset),
@@ -104,7 +103,7 @@ export default function Create({ page_settings, statuses,status, priorities, wor
                                                     <SelectContent id="status">
                                                         {statuses.map((status, index) => (
                                                             <SelectItem value={status.value} key={index}>
-                                                                {status.value}
+                                                                {status.label}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
@@ -124,7 +123,7 @@ export default function Create({ page_settings, statuses,status, priorities, wor
                                                     <SelectContent id="priority">
                                                         {priorities.map((priority, index) => (
                                                             <SelectItem value={priority.value} key={index}>
-                                                                {priority.value}
+                                                                {priority.label}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
@@ -133,30 +132,17 @@ export default function Create({ page_settings, statuses,status, priorities, wor
                                             </div>
                                         </div>
 
-                                        <div className="mt-4 flex items-center justify-between gap-x-4">
+                                        <div className="mt-4 flex items-center justify-end gap-x-4">
+                                            <Button type="button" variant="secondary" onClick={() => reset()}>
+                                                Reset
+                                            </Button>
 
-                                                <Link href={route('workspaces.show', [workspace])}>
-                                                    <Button type="button" variant="link"  >
-                                                        Back
-                                                    </Button>
-                                                </Link>
-                                            <div className='flex gap-x-3'>
-
-                                                <Button type="button" variant="secondary" onClick={() => reset()}>
-                                                    Reset
-                                                </Button>
-
-                                                <Button type="submit" variant="lime" disabled={processing}>
-                                                    Crate Card
-                                                </Button>
-                                                <Transition 
-                                                show={recentlySuccessful}
-                                                    enter='transition ease-in-out'
-                                                >
-
-                                                    <LoaderCircle className="animate-spin" />
-                                                </Transition>
-                                            </div>
+                                            <Button type="submit" variant="lime" disabled={processing}>
+                                                Crate Card
+                                            </Button>
+                                            <Transition show={recentlySuccessful}>
+                                                <LoaderCircle className="animate-spin" />
+                                            </Transition>
                                         </div>
                                     </div>
                                 </div>
