@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\CardPriority;
 use App\Enums\CardStatus;
 use App\Http\Requests\CardRequest;
+use App\Http\Resources\CardSingleResource;
 use App\Models\Card;
 use App\Models\Workspace;
 use Illuminate\Http\RedirectResponse;
@@ -68,6 +69,18 @@ class CardController extends Controller
         flashMessage('Card information saved succesfully');
         return to_route('workspaces.show', [$workspace]);
         // return to_route('cards.edit', [$workspace->slug, $card]);
+    }
+
+    public function show(Workspace $workspace, Card $card): Response
+    {
+        return inertia('Cards/Show', [
+            'cards' => fn() => new CardSingleResource($card->load(['members', 'user', 'tasks', 'attachments'])),
+            'page_settings' => [
+                'title' => 'Detail Card ' . $card->title,
+                'subtitle' => 'You can see card information',
+            ],
+
+        ]);
     }
 
     public function update(Workspace $workspace, Card $card, CardRequest $request): RedirectResponse
