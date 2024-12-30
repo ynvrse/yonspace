@@ -11,11 +11,7 @@ import { Transition } from '@headlessui/react';
 import { Link, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
-export default function Create({ page_settings, statuses,status, priorities, workspace }) {
- 
-
-    
-
+export default function Create({ page_settings, statuses, status, priorities, workspace }) {
     const { data, setData, processing, reset, post, errors, recentlySuccessful } = useForm({
         title: '',
         description: '',
@@ -134,14 +130,12 @@ export default function Create({ page_settings, statuses,status, priorities, wor
                                         </div>
 
                                         <div className="mt-4 flex items-center justify-between gap-x-4">
-
-                                                <Link href={route('workspaces.show', [workspace])}>
-                                                    <Button type="button" variant="link"  >
-                                                        Back
-                                                    </Button>
-                                                </Link>
-                                            <div className='flex gap-x-3'>
-
+                                            <Link href={route('workspaces.show', [workspace])}>
+                                                <Button type="button" variant="link">
+                                                    Back
+                                                </Button>
+                                            </Link>
+                                            <div className="flex gap-x-3">
                                                 <Button type="button" variant="secondary" onClick={() => reset()}>
                                                     Reset
                                                 </Button>
@@ -149,11 +143,7 @@ export default function Create({ page_settings, statuses,status, priorities, wor
                                                 <Button type="submit" variant="lime" disabled={processing}>
                                                     Crate Card
                                                 </Button>
-                                                <Transition 
-                                                show={recentlySuccessful}
-                                                    enter='transition ease-in-out'
-                                                >
-
+                                                <Transition show={recentlySuccessful} enter="transition ease-in-out">
                                                     <LoaderCircle className="animate-spin" />
                                                 </Transition>
                                             </div>

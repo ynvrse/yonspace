@@ -11,7 +11,7 @@ import { Transition } from '@headlessui/react';
 import { useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
-export default function Edit({ page_settings, statuses, priorities, workspace,card }) {
+export default function Edit({ page_settings, statuses, priorities, workspace, card }) {
     const { data, setData, processing, reset, post, errors, recentlySuccessful } = useForm({
         title: '',
         description: '',
@@ -20,8 +20,6 @@ export default function Edit({ page_settings, statuses, priorities, workspace,ca
         priority: 'Unknown',
         _method: page_settings.method,
     });
-
-
 
     const onHandleChange = (e) => {
         setData(e.target.name, e.target.value);
@@ -34,7 +32,7 @@ export default function Edit({ page_settings, statuses, priorities, workspace,ca
             page_settings.action,
             {
                 workspace: workspace.slug,
-                card: card
+                card: card,
             },
             {
                 ...handleFlashMessage(reset),
