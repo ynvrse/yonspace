@@ -42,7 +42,7 @@ export default function Create({ page_settings, statuses, status, priorities, wo
     };
 
     return (
-        <div className="space-y-10 divide-y divide-dashed divide-gray-900/10">
+        <div className="p-6 bg-gray-50 rounded-lg shadow-md">
             <div className="grid w-full grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2">
                 <HeaderForm title={page_settings.title} subtitle={page_settings.subtitle} />
 

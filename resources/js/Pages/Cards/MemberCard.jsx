@@ -18,10 +18,10 @@ import {
     AlertDialogTrigger,
 } from '@/Components/ui/alert-dialog';
 
+import InputDesc from '@/Components/InputDesc';
 import { handleFlashMessage } from '@/lib/utils';
-import { Transition } from '@headlessui/react';
-import { useForm } from '@inertiajs/react';
-import { LoaderCircle, X } from 'lucide-react';
+import { router, useForm } from '@inertiajs/react';
+import { X } from 'lucide-react';
 import { useState } from 'react';
 
 export default function MemberCard({ action, members }) {
@@ -41,8 +41,6 @@ export default function MemberCard({ action, members }) {
         email: '',
     });
 
-    console.log(members);
-
     const onHandleChange = (e) => {
         setData(e.target.name, e.target.value);
     };
@@ -61,31 +59,25 @@ export default function MemberCard({ action, members }) {
         <Card>
             <CardContent>
                 <form method="POST" onSubmit={OnHandleSubmit}>
-                    <div className="py-6">
-                        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <div className="col-span-full">
-                                <InputLabel htmlFor="email" value="email" />
-                                <TextInput
-                                    type="text"
-                                    name="email"
-                                    id="email"
-                                    value={data.email}
-                                    isFocused={true}
-                                    onChange={onHandleChange}
-                                    onErrors={errors.email && <InputError message={errors.email} />}
-                                />
-                            </div>
-
-                            <div className="col-span-full">
-                                <div className="flex items-center justify-end gap-x-4">
-                                    <Button type="submit" variant="lime" disabled={processing}>
-                                        <Transition show={recentlySuccessful} enter="transition ease-in-out">
-                                            <LoaderCircle className="animate-spin" />
-                                        </Transition>
-                                        Invite
-                                    </Button>
+                    <div className="py-2">
+                        <div className="flex w-full flex-col gap-1 py-2">
+                            <InputLabel htmlFor="email">Email</InputLabel>
+                            <div className="flex items-center justify-between gap-x-2">
+                                <div className="flex-grow">
+                                    <TextInput
+                                        id="email"
+                                        name="email"
+                                        value={data.email}
+                                        placeholder="Enter member email"
+                                        onChange={onHandleChange}
+                                        onErrors={errors.email && <InputError message={errors.email} />}
+                                    />
                                 </div>
+                                <Button type="submit" disabled={processing} variant="lime" size="lg" className="mt-2">
+                                    <span>Invite</span>
+                                </Button>
                             </div>
+                            <InputDesc>Enter the email address of the person you want to invite.</InputDesc>
                         </div>
                     </div>
                 </form>
@@ -145,19 +137,19 @@ export default function MemberCard({ action, members }) {
                                                                 <AlertDialogFooter>
                                                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                                                     <AlertDialogAction
-                                                                        onClick={() =>
+                                                                        onClick={() => {
                                                                             router.delete(
-                                                                                route('workspaces.member_destroy', {
-                                                                                    workspace: member.memberable_id,
+                                                                                route('member_card.destroy', {
+                                                                                    card: member.memberable_id,
                                                                                     member: member.id,
                                                                                 }),
                                                                                 {
-                                                                                    ...handleFlashMessage(reset),
                                                                                     preserveScroll: true,
                                                                                     preserveState: true,
+                                                                                    ...handleFlashMessage(),
                                                                                 },
-                                                                            )
-                                                                        }
+                                                                            );
+                                                                        }}
                                                                     >
                                                                         Continue
                                                                     </AlertDialogAction>

@@ -2,8 +2,8 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build && vite build --ssr --watch",
         "dev": "vite",
+        "build": "vite build && vite build --ssr --watch",
         "format": "prettier --write ."
     },
     "devDependencies": {

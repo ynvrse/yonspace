@@ -4,14 +4,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { CardTitle } from '@/Components/ui/card';
 import AppLayout from '@/Layouts/AppLayout';
 import { getAvatarFallback, handleFlashMessage } from '@/lib/utils';
-import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext } from '@dnd-kit/sortable';
+import { TouchSensor, MouseSensor, DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { Link, router } from '@inertiajs/react';
 import { Settings, UsersRound } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import CardList from './Partials/CardList';
 import StatusList from './Partials/StatusList';
+
 
 export default function Show({ ...props }) {
     const { workspace, workspace_settings, card, visibilities, member_dialog } = props;
@@ -48,7 +49,6 @@ export default function Show({ ...props }) {
     const handleReorderCard = (active, over) => {
         const currentCardId = active.data.current.card.id;
 
-        // Dapatkan opsi untuk flash message
         const flashMessageHandlers = handleFlashMessage();
 
         router.post(
@@ -64,13 +64,19 @@ export default function Show({ ...props }) {
         );
     };
 
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 10,
-            },
-        }),
-    );
+
+        const isMobileDevice = () => {
+            return /Mobi|Android/i.test(navigator.userAgent);
+        };
+
+        const sensors = useSensors(
+            useSensor(isMobileDevice() ? TouchSensor : PointerSensor, {
+                activationConstraint: {
+                    distance: 10, 
+                },
+            })
+        );
+    
 
     const onDragStart = (event) => {
         if (event.active.data.current?.type === 'Cards') {
@@ -80,69 +86,95 @@ export default function Show({ ...props }) {
     };
 
     const onDragEnd = (event) => {
-        setActiveStatus(null);
-        setActiveCard(null);
-
         const { active, over } = event;
         if (!over) return;
-        const activeId = active.id;
-
-        const overId = over.id;
-
-        if (activeId === overId) return;
-        const isActiveAStatus = active.data.current?.type === 'Status';
-
-        if (!isActiveAStatus) return;
-
-        setStatuses((statuses) => {
-            const activeStatusIndex = statuses.findIndex((status) => status.value === activeId);
-            const overStatusIndex = statuses.findIndex((status) => status.value === overId);
-
-            return arrayMove(statuses, activeStatusIndex, overStatusIndex);
-        });
-    };
-
-    const onDragOver = (event) => {
-        const { active, over } = event;
-        if (!over) return;
-
+    
         const activeId = active.id;
         const overId = over.id;
-
-        if (activeId === overId) return;
-
+    
         const isActiveACard = active.data.current?.type === 'Card';
         const isOverACard = over.data.current?.type === 'Card';
-
-        if (!isActiveACard) return;
-
-        if (!isActiveACard && isOverACard) {
+    
+        if (isActiveACard && isOverACard) {
             setCards((cards) => {
                 const activeIndex = cards.findIndex((card) => card.id === activeId);
-
                 const overIndex = cards.findIndex((card) => card.id === overId);
-
-                if (cards[activeIndex].status !== card[overIndex].status) {
+    
+                if (cards[activeIndex].status !== cards[overIndex].status) {
                     cards[activeIndex].status = cards[overIndex].status;
                     return arrayMove(cards, activeIndex, overIndex - 1);
                 }
-
+    
                 return arrayMove(cards, activeIndex, overIndex);
             });
+    
+            // Panggil handleReorderCard tanpa kondisi
+            handleReorderCard(active, over);
+            return;
         }
+    
         const isOverAStatus = over.data.current?.type === 'Status';
-
+    
         if (isActiveACard && isOverAStatus) {
             setCards((cards) => {
                 const activeIndex = cards.findIndex((card) => card.id === activeId);
                 cards[activeIndex].status = overId;
-
+    
                 return arrayMove(cards, activeIndex, activeIndex);
             });
+    
+            // Panggil handleReorderCard tanpa kondisi
+            handleReorderCard(active, over);
+            return;
         }
-
+    
+        // Jika aktif adalah tipe lain, tetap panggil handleReorderCard
         handleReorderCard(active, over);
     };
+    
+    
+
+    const onDragOver = (event) => {
+        const { active, over } = event;
+        if (!over) return;
+    
+        const activeId = active.id;
+        const overId = over.id;
+    
+        if (activeId === overId) return;
+    
+        const isActiveACard = active.data.current?.type === 'Card';
+        const isOverACard = over.data.current?.type === 'Card';
+    
+        if (isActiveACard && isOverACard) {
+            setCards((cards) => {
+                const activeIndex = cards.findIndex((card) => card.id === activeId);
+                const overIndex = cards.findIndex((card) => card.id === overId);
+    
+                if (cards[activeIndex].status !== cards[overIndex].status) {
+                    cards[activeIndex].status = cards[overIndex].status;
+                    return arrayMove(cards, activeIndex, overIndex - 1);
+                }
+    
+                return arrayMove(cards, activeIndex, overIndex);
+            });
+            return;
+        }
+    
+        const isOverAStatus = over.data.current?.type === 'Status';
+    
+        if (isActiveACard && isOverAStatus) {
+            setCards((cards) => {
+                const activeIndex = cards.findIndex((card) => card.id === activeId);
+                cards[activeIndex].status = overId;
+    
+                return arrayMove(cards, activeIndex, activeIndex);
+            });
+            return;
+        }
+    };
+    
+    
 
     return (
         <>
@@ -208,7 +240,7 @@ export default function Show({ ...props }) {
             </div>
 
             <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver}>
-                <div className="mt-2 flex w-full flex-col justify-start gap-x-5 gap-y-8 sm:flex-row">
+                <div className="mt-2 flex w-full flex-col min-h-[400px] justify-start gap-x-5 gap-y-8 sm:flex-row">
                     <SortableContext items={statusesId}>
                         {statuses.map((status) => (
                             <StatusList

@@ -33,10 +33,11 @@ export default function CardList({ card, workspace, handleDeleteCard }) {
             <Card
                 ref={setNodeRef}
                 style={style}
-                className="relative flex h-[100px] min-h-[100px] cursor-grabbing items-center rounded-xl border border-dashed border-muted-foreground bg-gray-300 p-2.5 text-left opacity-30"
+                className="relative flex h-[100px] min-h-[100px] cursor-grabbing items-center rounded-xl border border-dashed border-muted-foreground bg-gray-300 p-2.5 text-left opacity-30 animate-[shake_0.3s_ease-in-out_infinite]"
             ></Card>
         );
     }
+    
 
     return (
         <Card
@@ -44,13 +45,13 @@ export default function CardList({ card, workspace, handleDeleteCard }) {
             style={style}
             {...attributes}
             {...listeners}
-            className="task relative cursor-grab rounded-xl hover:ring-2 hover:ring-inset hover:ring-lime-400"
+            className="task relative  cursor-grab rounded-xl hover:ring-2 hover:ring-inset hover:ring-lime-400"
         >
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <CardTitle className="line-clamp-2 text-base leading-relaxed tracking-tighter">
                         <Link href={route('cards.show', [workspace, card])} className="hover:text-lime-500">
-                            {card.title}
+                            {card.title} 
                         </Link>
                     </CardTitle>
                     <DropdownMenu>

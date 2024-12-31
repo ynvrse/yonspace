@@ -2,7 +2,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
 import TextInput from '@/Components/TextInput';
-import Button from '@/Components/ui/Button';
+import {Button} from '@/Components/ui/Button';
 import { useForm } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 
