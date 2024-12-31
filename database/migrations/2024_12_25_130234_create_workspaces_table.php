@@ -19,8 +19,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('slug')->unique();
-            $table->string('cover');
-            $table->string('logo');
+            $table->string('cover')->nullable();
+            $table->string('logo')->nullable();
             $table->string('visibility')->default(WorkspaceVisibility::PRIVATE->value);
             $table->timestamps();
         });

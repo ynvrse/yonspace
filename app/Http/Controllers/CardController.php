@@ -190,7 +190,7 @@ class CardController extends Controller
             $this->adjustOrdering($workspace, $last_status_active);
         }
 
-        flashMessage('The card has been succesfully moved');
+        flashMessage('Status has been updated to '. $active->status->value);
         return to_route('workspaces.show', $workspace);
     }
 }
