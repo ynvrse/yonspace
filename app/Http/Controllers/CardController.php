@@ -16,6 +16,13 @@ class CardController extends Controller
 {
 
 
+    public function test(): RedirectResponse
+    {
+        flashMessage('hallo dunia');
+        return back();
+    }
+
+
     public function create(Workspace $workspace): Response
     {
         return inertia('Cards/Create', [
@@ -41,14 +48,15 @@ class CardController extends Controller
                 'title' => 'Edit Card',
                 'subtitle' => 'Fill out this form to edit this card',
                 'method' => 'PUT',
-                'action' => route('cards.update', $workspace, $card),
+                'action' => route('cards.update', [$workspace, $card]),
             ],
             'status' => request()->status ?? '',
             'statuses' => CardStatus::options(),
             'priority' => request()->priority ?? CardPriority::UNKNOWN->value,
             'priorities' => CardPriority::options(),
             'workspace' => fn() => $workspace->only('slug', 'name'),
-            'card' => $card,
+            'card' => fn() => new CardSingleResource($card->load(['members', 'user', 'tasks', 'attachments'])),
+
         ]);
     }
 
@@ -65,10 +73,15 @@ class CardController extends Controller
             'priority' => $request->priority,
         ]);
 
+        $card->members()->create([
+            'user_id' => $request->user()->id,
+            'role' => $card->user_id == $request->user()->id ? 'Owner' : 'Member'
+        ]);
+
 
         flashMessage('Card information saved succesfully');
+
         return to_route('workspaces.show', [$workspace]);
-        // return to_route('cards.edit', [$workspace->slug, $card]);
     }
 
     public function show(Workspace $workspace, Card $card): Response
@@ -85,7 +98,7 @@ class CardController extends Controller
 
     public function update(Workspace $workspace, Card $card, CardRequest $request): RedirectResponse
     {
-
+        $last_status = $card->status->value;
 
         $card->update([
             'workspace_id' => $workspace->id,
@@ -97,10 +110,27 @@ class CardController extends Controller
             'priority' => $request->priority,
         ]);
 
+        $this->adjustOrdering($workspace, $last_status);
 
-        flashMessage('Card information saved succesfully');
-        return to_route('cards.edit', [$workspace->slug, $card->id]);
+
+        flashMessage('Succesfully save card information');
+
+
+        return to_route('workspaces.show', [$workspace]);
     }
+
+    public function destroy(Workspace $workspace, Card $card): RedirectResponse
+    {
+        $last_status = $card->status->value;
+
+        $card->delete();
+
+        $this->adjustOrdering($workspace, $last_status);
+
+        flashMessage('The card has been successfuly deleted');
+        return to_route('workspaces.show', [$workspace]);
+    }
+
 
 
     public function ordering(Workspace $workspace, string $status): int
@@ -111,5 +141,56 @@ class CardController extends Controller
             ->orderByDesc('order')
             ->first();
         return $last_card ? $last_card->order + 1 : 1;
+    }
+    public function adjustOrdering(Workspace $workspace, string $status)
+    {
+        $order = 1;
+        return Card::where('workspace_id', $workspace->id)
+            ->where('status', $status)
+            ->orderBy('order')
+            ->get()
+            ->each(function ($card) use (&$order) {
+                $card->order = $order;
+                $card->save();
+                $order++;
+            });
+    }
+
+
+    public function reorder(Workspace $workspace, Card $card, Request $request): RedirectResponse
+    {
+        if ($request->cardActive['type'] === $request->cardOver['type']) {
+            $active = Card::find($request->cardActive['data']);
+            $over = Card::find($request->cardOver['data']);
+
+            if ($active->status->value === $over->status->value) {
+                $temp_order = $active->order;
+                $active->order = $over->order;
+                $over->order =  $temp_order;
+
+                $active->save();
+                $over->save();
+            } else {
+                $last_status_active = $active->status->value;
+                $active->status = $over->status->value;
+                $active->save();
+
+                $this->adjustOrdering($workspace, $last_status_active);
+
+                $this->adjustOrdering($workspace, $active->status->value);
+            }
+        } else {
+            $active = Card::find($request->cardActive['data']);
+            $last_status_active = $active->status->value;
+
+            $active->status = $request->cardOver['data'];
+            $active->order = $this->ordering($workspace, $request->cardOver['data']);
+            $active->save();
+
+            $this->adjustOrdering($workspace, $last_status_active);
+        }
+
+        flashMessage('The card has been succesfully moved');
+        return to_route('workspaces.show', $workspace);
     }
 }

@@ -16,7 +16,7 @@ export const STATUS = {
 export const PRIORITY = {
     URGENT: 'Urgent',
     HIGH: 'High',
-    MEDIUTM: 'Medium',
+    MEDIUM: 'Medium',
     LOW: 'Low',
     UNKNOWN: 'Unknown',
 };
@@ -40,6 +40,7 @@ export function handleFlashMessage(resetCallback = null) {
     return {
         onSuccess: (success) => {
             const flash = flashMessage(success); // Handle flash message logic
+
             if (flash) toast[flash.type](flash.message); // Show flash toast
             if (resetCallback) resetCallback(); // Reset form if provided
         },

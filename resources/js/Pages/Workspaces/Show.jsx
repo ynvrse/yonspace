@@ -1,15 +1,148 @@
 import EditWorkspace from '@/Components/FormDialog/EditWorkspace';
 import MemberWorkspace from '@/Components/FormDialog/MemberWorkspace';
-import GetPriorityBadge from '@/Components/GetPriorityBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { CardTitle } from '@/Components/ui/card';
 import AppLayout from '@/Layouts/AppLayout';
-import { getAvatarFallback } from '@/lib/utils';
-import { Link } from '@inertiajs/react';
-import { Plus, Settings, UsersRound } from 'lucide-react';
+import { getAvatarFallback, handleFlashMessage } from '@/lib/utils';
+import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext } from '@dnd-kit/sortable';
+import { Link, router } from '@inertiajs/react';
+import { Settings, UsersRound } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import CardList from './Partials/CardList';
+import StatusList from './Partials/StatusList';
 
 export default function Show({ ...props }) {
-    const { workspace, workspace_settings, cards, statuses, visibilities, member_dialog } = props;
+    const { workspace, workspace_settings, card, visibilities, member_dialog } = props;
+
+    const [statuses, setStatuses] = useState(props.statuses);
+
+    const statusesId = useMemo(() => statuses.map((status) => status.value), [statuses]);
+    const [cards, setCards] = useState(props.cards);
+
+    const [activeStatus, setActiveStatus] = useState(null);
+    const [activeCard, setActiveCard] = useState(null);
+
+    const handleDeleteCard = (id) => {
+        const flashMessageHandlers = handleFlashMessage();
+
+        router.delete(
+            route('cards.destroy', {
+                workspace: workspace.slug,
+                card: id,
+            }),
+            flashMessageHandlers,
+        );
+        const newCards = cards.filter((card) => card.id !== id);
+        setCards(newCards);
+    };
+
+    const handleDataCard = (current) => {
+        return {
+            type: current.type,
+            data: current.type === 'Card' ? current.card.id : current.status.value,
+        };
+    };
+
+    const handleReorderCard = (active, over) => {
+        const currentCardId = active.data.current.card.id;
+
+        // Dapatkan opsi untuk flash message
+        const flashMessageHandlers = handleFlashMessage();
+
+        router.post(
+            route('cards.reorder', {
+                workspace: workspace,
+                card: currentCardId,
+            }),
+            {
+                cardActive: handleDataCard(active.data.current),
+                cardOver: handleDataCard(over.data.current),
+            },
+            flashMessageHandlers, // Tambahkan opsi flash message di sini
+        );
+    };
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 10,
+            },
+        }),
+    );
+
+    const onDragStart = (event) => {
+        if (event.active.data.current?.type === 'Cards') {
+            setActiveCard(event.active.data.current.card);
+            return;
+        }
+    };
+
+    const onDragEnd = (event) => {
+        setActiveStatus(null);
+        setActiveCard(null);
+
+        const { active, over } = event;
+        if (!over) return;
+        const activeId = active.id;
+
+        const overId = over.id;
+
+        if (activeId === overId) return;
+        const isActiveAStatus = active.data.current?.type === 'Status';
+
+        if (!isActiveAStatus) return;
+
+        setStatuses((statuses) => {
+            const activeStatusIndex = statuses.findIndex((status) => status.value === activeId);
+            const overStatusIndex = statuses.findIndex((status) => status.value === overId);
+
+            return arrayMove(statuses, activeStatusIndex, overStatusIndex);
+        });
+    };
+
+    const onDragOver = (event) => {
+        const { active, over } = event;
+        if (!over) return;
+
+        const activeId = active.id;
+        const overId = over.id;
+
+        if (activeId === overId) return;
+
+        const isActiveACard = active.data.current?.type === 'Card';
+        const isOverACard = over.data.current?.type === 'Card';
+
+        if (!isActiveACard) return;
+
+        if (!isActiveACard && isOverACard) {
+            setCards((cards) => {
+                const activeIndex = cards.findIndex((card) => card.id === activeId);
+
+                const overIndex = cards.findIndex((card) => card.id === overId);
+
+                if (cards[activeIndex].status !== card[overIndex].status) {
+                    cards[activeIndex].status = cards[overIndex].status;
+                    return arrayMove(cards, activeIndex, overIndex - 1);
+                }
+
+                return arrayMove(cards, activeIndex, overIndex);
+            });
+        }
+        const isOverAStatus = over.data.current?.type === 'Status';
+
+        if (isActiveACard && isOverAStatus) {
+            setCards((cards) => {
+                const activeIndex = cards.findIndex((card) => card.id === activeId);
+                cards[activeIndex].status = overId;
+
+                return arrayMove(cards, activeIndex, activeIndex);
+            });
+        }
+
+        handleReorderCard(active, over);
+    };
 
     return (
         <>
@@ -20,6 +153,7 @@ export default function Show({ ...props }) {
                     className="h-32 w-full object-cover lg:h-48"
                 />
             </div>
+
             <div className="px-2 sm:px-4">
                 <div className="-mt-12 sm:items-center sm:space-x-5">
                     <div className="flex justify-between">
@@ -72,59 +206,39 @@ export default function Show({ ...props }) {
                     </div>
                 </div>
             </div>
-            <div className="mt-2 flex w-full flex-col justify-start gap-x-5 gap-y-8 sm:flex-row">
-                {statuses.map((status, index) => (
-                    <div className="w-full space-y-4 sm:w-1/4" key={index}>
-                        <div className="flex items-center justify-between">
-                            <span className="text-base font-semibold leading-relaxed tracking-tighter">
-                                {status.value}
-                            </span>
-                            <div className="flex items-center gap-x-3">
-                                <Link
-                                    href={route('cards.create', {
-                                        workspace: workspace,
-                                        _query: {
-                                            status: status.value,
-                                        },
-                                    })}
-                                >
-                                    <Plus size={14} />
-                                </Link>
-                            </div>
-                        </div>
-                        {/* column card container */}
-                        <div className="flex flex-grow flex-col gap-4 overflow-y-auto overflow-x-hidden p-2">
-                            {cards
-                                .filter((card) => card.status == status.value)
-                                .map((card, index) => (
-                                    <Card
-                                        key={index}
-                                        className="relative rounded-xl hover:ring-2 hover:ring-inset hover:ring-lime-400"
-                                    >
-                                        <CardHeader>
-                                            <div className="flex items-center justify-between">
-                                                <CardTitle className="line-clamp-2 text-base leading-relaxed tracking-tighter">
-                                                    <Link
-                                                        href={route('cards.show', [workspace, card])}
-                                                        className="hover:text-lime-500"
-                                                    >
-                                                        {card.title}
-                                                    </Link>
-                                                </CardTitle>
-                                            </div>
-                                            <div>
-                                                <GetPriorityBadge priority={card.priority} />
-                                            </div>
-                                            <CardDescription className="line-clamp-4 leading-relaxed tracking-tighter">
-                                                {card.description}
-                                            </CardDescription>
-                                        </CardHeader>
-                                    </Card>
-                                ))}
-                        </div>
-                    </div>
-                ))}
-            </div>
+
+            <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver}>
+                <div className="mt-2 flex w-full flex-col justify-start gap-x-5 gap-y-8 sm:flex-row">
+                    <SortableContext items={statusesId}>
+                        {statuses.map((status) => (
+                            <StatusList
+                                key={status.value}
+                                status={status}
+                                cards={cards.filter((card) => card.status === status.value)}
+                                workspace={workspace}
+                                handleDeleteCard={handleDeleteCard}
+                            />
+                        ))}
+                    </SortableContext>
+                </div>
+
+                {createPortal(
+                    activeStatus || activeCard ? (
+                        <DragOverlay>
+                            {activeStatus && (
+                                <StatusList
+                                    status={activeStatus}
+                                    cards={cards.filter((card) => card.status === activeStatus.value)}
+                                    workspace={workspace}
+                                    handleDeleteCard={handleDeleteCard}
+                                />
+                            )}
+                            {activeCard && <CardList card={activeCard} workspace={workspace} />}
+                        </DragOverlay>
+                    ) : null,
+                    document.body,
+                )}
+            </DndContext>
         </>
     );
 }

@@ -1,7 +1,7 @@
 import {
     AlertDialog,
     AlertDialogAction,
-    AlertDialogCancle,
+    AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
     AlertDialogFooter,
@@ -20,7 +20,7 @@ export default function ActionDialog({ trigger, action, title, description }) {
                     <AlertDialogDescription>{description}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancle>Cancel</AlertDialogCancle>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction onClick={action}>Continue</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

@@ -25,12 +25,14 @@ class CardSingleResource extends JsonResource
             'deadline' => $this->deadline
                 ? [
                     'format' => Carbon::parse($this->deadline)->format('d M Y'),
-                    'unformated' => $this->deadline,
+                    'unformated' =>  Carbon::parse($this->deadline)->format('Y-m-d'),
                 ]
                 : null,
             'status' => $this->status?->value ?? null,
             'priority' => $this->priority,
-            'created_at' => $this->created_at->format('d M Y'),
+            'created_at' => Carbon::parse($this->created_at),
+            'members' => MemberResource::collection($this->members),
+            'members_count' => $this->members_count,
         ];
     }
 }

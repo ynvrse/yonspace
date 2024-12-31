@@ -8,16 +8,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/Layouts/AppLayout';
 import { handleFlashMessage } from '@/lib/utils';
 import { Transition } from '@headlessui/react';
-import { useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
+import MemberCard from './MemberCard';
 
-export default function Edit({ page_settings, statuses, priorities, workspace, card }) {
+export default function Edit({ page_settings, status, statuses, priorities, workspace, card }) {
     const { data, setData, processing, reset, post, errors, recentlySuccessful } = useForm({
-        title: '',
-        description: '',
-        deadline: null,
-        status: 'To Do',
-        priority: 'Unknown',
+        title: card?.title,
+        description: card?.description,
+        deadline: card.deadline ? card.deadline.unformated : null,
+        status: card?.status,
+        priority: card?.priority,
         _method: page_settings.method,
     });
 
@@ -33,9 +34,9 @@ export default function Edit({ page_settings, statuses, priorities, workspace, c
             {
                 workspace: workspace.slug,
                 card: card,
+                ...handleFlashMessage(reset),
             },
             {
-                ...handleFlashMessage(reset),
                 preserveScroll: true,
                 preserveState: true,
             },
@@ -101,7 +102,7 @@ export default function Edit({ page_settings, statuses, priorities, workspace, c
                                                     <SelectContent id="status">
                                                         {statuses.map((status, index) => (
                                                             <SelectItem value={status.value} key={index}>
-                                                                {status.label}
+                                                                {status.value}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
@@ -121,7 +122,7 @@ export default function Edit({ page_settings, statuses, priorities, workspace, c
                                                     <SelectContent id="priority">
                                                         {priorities.map((priority, index) => (
                                                             <SelectItem value={priority.value} key={index}>
-                                                                {priority.label}
+                                                                {priority.value}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
@@ -130,17 +131,27 @@ export default function Edit({ page_settings, statuses, priorities, workspace, c
                                             </div>
                                         </div>
 
-                                        <div className="mt-4 flex items-center justify-end gap-x-4">
-                                            <Button type="button" variant="secondary" onClick={() => reset()}>
-                                                Reset
-                                            </Button>
+                                        <div className="mt-4 flex items-center justify-between gap-x-4">
+                                            <Link href={route('workspaces.show', [workspace])}>
+                                                <Button type="button" variant="link">
+                                                    Back
+                                                </Button>
+                                            </Link>
+                                            <div className="flex gap-x-3">
+                                                <Button type="button" variant="secondary" onClick={() => reset()}>
+                                                    Reset
+                                                </Button>
 
-                                            <Button type="submit" variant="lime" disabled={processing}>
-                                                Crate Card
-                                            </Button>
-                                            <Transition show={recentlySuccessful}>
-                                                <LoaderCircle className="animate-spin" />
-                                            </Transition>
+                                                <Button type="submit" variant="lime" disabled={processing}>
+                                                    <Transition
+                                                        show={recentlySuccessful}
+                                                        enter="transition ease-in-out"
+                                                    >
+                                                        <LoaderCircle className="animate-spin" />
+                                                    </Transition>
+                                                    Save
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -149,10 +160,15 @@ export default function Edit({ page_settings, statuses, priorities, workspace, c
                     </CardContent>
                 </Card>
             </div>
+
+            <div className="grid w-full grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2">
+                <HeaderForm title="Members" subtitle="Please add members to the card" />
+                <MemberCard action={route('member_card.store', { card: card })} members={card.members} />
+            </div>
         </div>
     );
 }
 
-Create.layout = (page) => (
-    <AppLayout children={page} headers={[page.props.workspace.name, 'Card', 'Create']} title={page.props.workspace} />
+Edit.layout = (page) => (
+    <AppLayout children={page} headers={['Card', page.props.card.title, 'Detail']} title={page.props.card.title} />
 );

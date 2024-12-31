@@ -20,6 +20,7 @@ import {
 } from '@/Components/ui/sidebar';
 import { getAvatarFallback, handleFlashMessage } from '@/lib/utils';
 import { Link, router } from '@inertiajs/react';
+import ActionDialog from './ActionDialog';
 export function NavWorkspaces({ workspaces }) {
     const { isMobile } = useSidebar();
     const { pathname } = window.location;
@@ -72,23 +73,30 @@ export function NavWorkspaces({ workspaces }) {
                                         <span>Share Workspace</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                        onClick={() =>
+
+                                    <ActionDialog
+                                        trigger={
+                                            <DropdownMenuItem
+                                                onSelect={(e) => {
+                                                    e.preventDefault();
+                                                }}
+                                            >
+                                                <Trash2 /> Delete Workspace
+                                            </DropdownMenuItem>
+                                        }
+                                        title="Delete Workspace"
+                                        description="Are you want to delete this workspace?"
+                                        action={() =>
                                             router.delete(
                                                 route('workspaces.destroy', {
                                                     workspace: item.slug,
                                                 }),
                                                 {
                                                     ...handleFlashMessage(),
-                                                    preserveScroll: true,
-                                                    preserveState: true,
                                                 },
                                             )
                                         }
-                                    >
-                                        <Trash2 className="text-muted-foreground" />
-                                        <span>Delete Workspace</span>
-                                    </DropdownMenuItem>
+                                    />
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </SidebarMenuItem>

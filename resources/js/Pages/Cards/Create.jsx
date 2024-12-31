@@ -32,9 +32,9 @@ export default function Create({ page_settings, statuses, status, priorities, wo
             page_settings.action,
             {
                 workspace: workspace.slug,
+                ...handleFlashMessage(reset),
             },
             {
-                ...handleFlashMessage(reset),
                 preserveScroll: true,
                 preserveState: true,
             },
@@ -141,11 +141,14 @@ export default function Create({ page_settings, statuses, status, priorities, wo
                                                 </Button>
 
                                                 <Button type="submit" variant="lime" disabled={processing}>
+                                                    <Transition
+                                                        show={recentlySuccessful}
+                                                        enter="transition ease-in-out"
+                                                    >
+                                                        <LoaderCircle className="animate-spin" />
+                                                    </Transition>
                                                     Crate Card
                                                 </Button>
-                                                <Transition show={recentlySuccessful} enter="transition ease-in-out">
-                                                    <LoaderCircle className="animate-spin" />
-                                                </Transition>
                                             </div>
                                         </div>
                                     </div>
