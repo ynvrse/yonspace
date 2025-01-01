@@ -22,9 +22,18 @@ class AttachmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required', 'file', 'mimes:png,jpg,pdf,zip', 'max:4096'],
-            'link' => ['nullable', 'llink'],
+            'file' => ['required','file', 'mimes:png,jpg,pdf,zip', 'max:4096'],
+            'link' => ['nullable', 'link'],
             'name' => ['nullable', 'string', 'max:255']
+        ];
+    }
+
+    public function attributes():array
+    {
+        return [
+            'file' => 'File',
+            'link' => 'Link',
+            'name' => 'Name',
         ];
     }
 }
