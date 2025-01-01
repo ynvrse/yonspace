@@ -5,6 +5,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\MemberCardController;
+use App\Http\Controllers\AttachmentController;
+
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -40,6 +42,11 @@ Route::prefix('cards/{workspace:slug}')->controller(CardController::class)->grou
     Route::delete('destroy/{card}', 'destroy')->name('cards.destroy');
 });
 
+
+
+Route::controller(AttachmentController::class)->group(function () {
+    Route::post('cards/attachment/{card}/create', 'store')->name('attachments.store');
+})->middleware('auth');
 
 
 Route::controller(MemberCardController::class)->group(function () {

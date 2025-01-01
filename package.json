@@ -3,7 +3,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build && vite build --ssr --watch",
+        "build": "vite build & vite build --watch",
         "format": "prettier --write ."
     },
     "devDependencies": {
@@ -11,6 +11,7 @@
         "@inertiajs/react": "^2.0.0",
         "@tailwindcss/forms": "^0.5.3",
         "@tailwindcss/typography": "^0.5.15",
+        "@vitejs/plugin-basic-ssl": "^1.2.0",
         "@vitejs/plugin-react": "^4.2.0",
         "autoprefixer": "^10.4.12",
         "axios": "^1.7.4",

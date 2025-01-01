@@ -28,15 +28,6 @@ export default function CardList({ card, workspace, handleDeleteCard }) {
         transform: CSS.Transform.toString(transform),
     };
 
-    if (isDragging) {
-        return (
-            <Card
-                ref={setNodeRef}
-                style={style}
-                className="relative flex h-[100px] min-h-[100px] cursor-grabbing items-center rounded-xl border border-dashed border-muted-foreground bg-gray-300 p-2.5 text-left opacity-30 animate-[shake_0.3s_ease-in-out_infinite]"
-            ></Card>
-        );
-    }
     
 
     return (
@@ -45,7 +36,9 @@ export default function CardList({ card, workspace, handleDeleteCard }) {
             style={style}
             {...attributes}
             {...listeners}
-            className="task relative  cursor-grab rounded-xl hover:ring-2 hover:ring-inset hover:ring-lime-400"
+
+            className={`task relative ${isDragging && 'cursor-grabbing  opacity-30 animate-[shake_0.3s_ease-in-out_infinite]'} cursor-grab rounded-xl hover:ring-2 hover:ring-inset hover:ring-lime-400`}
+
         >
             <CardHeader>
                 <div className="flex items-center justify-between">

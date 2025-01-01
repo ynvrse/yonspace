@@ -78,102 +78,94 @@ export default function Show({ ...props }) {
         );
     
 
-    const onDragStart = (event) => {
-        if (event.active.data.current?.type === 'Cards') {
-            setActiveCard(event.active.data.current.card);
-            return;
-        }
-    };
-
-    const onDragEnd = (event) => {
-        const { active, over } = event;
-        if (!over) return;
-    
-        const activeId = active.id;
-        const overId = over.id;
-    
-        const isActiveACard = active.data.current?.type === 'Card';
-        const isOverACard = over.data.current?.type === 'Card';
-    
-        if (isActiveACard && isOverACard) {
-            setCards((cards) => {
-                const activeIndex = cards.findIndex((card) => card.id === activeId);
-                const overIndex = cards.findIndex((card) => card.id === overId);
-    
-                if (cards[activeIndex].status !== cards[overIndex].status) {
-                    cards[activeIndex].status = cards[overIndex].status;
-                    return arrayMove(cards, activeIndex, overIndex - 1);
-                }
-    
-                return arrayMove(cards, activeIndex, overIndex);
-            });
-    
-            // Panggil handleReorderCard tanpa kondisi
-            handleReorderCard(active, over);
-            return;
-        }
-    
-        const isOverAStatus = over.data.current?.type === 'Status';
-    
-        if (isActiveACard && isOverAStatus) {
-            setCards((cards) => {
-                const activeIndex = cards.findIndex((card) => card.id === activeId);
-                cards[activeIndex].status = overId;
-    
-                return arrayMove(cards, activeIndex, activeIndex);
-            });
-    
-            // Panggil handleReorderCard tanpa kondisi
-            handleReorderCard(active, over);
-            return;
-        }
-    
-        // Jika aktif adalah tipe lain, tetap panggil handleReorderCard
-        handleReorderCard(active, over);
-    };
-    
-    
-
-    const onDragOver = (event) => {
-        const { active, over } = event;
-        if (!over) return;
-    
-        const activeId = active.id;
-        const overId = over.id;
-    
-        if (activeId === overId) return;
-    
-        const isActiveACard = active.data.current?.type === 'Card';
-        const isOverACard = over.data.current?.type === 'Card';
-    
-        if (isActiveACard && isOverACard) {
-            setCards((cards) => {
-                const activeIndex = cards.findIndex((card) => card.id === activeId);
-                const overIndex = cards.findIndex((card) => card.id === overId);
-    
-                if (cards[activeIndex].status !== cards[overIndex].status) {
-                    cards[activeIndex].status = cards[overIndex].status;
-                    return arrayMove(cards, activeIndex, overIndex - 1);
-                }
-    
-                return arrayMove(cards, activeIndex, overIndex);
-            });
-            return;
-        }
-    
-        const isOverAStatus = over.data.current?.type === 'Status';
-    
-        if (isActiveACard && isOverAStatus) {
-            setCards((cards) => {
-                const activeIndex = cards.findIndex((card) => card.id === activeId);
-                cards[activeIndex].status = overId;
-    
-                return arrayMove(cards, activeIndex, activeIndex);
-            });
-            return;
-        }
-    };
-    
+        const updateCardStatus = (cards, cardId, newStatus) => {
+            return cards.map((card) =>
+                card.id === cardId ? { ...card, status: newStatus } : card
+            );
+        };
+        
+        const moveCardPosition = (cards, fromIndex, toIndex) => {
+            if (fromIndex === toIndex) return cards; // Tidak perlu memindahkan jika indeks sama
+            return arrayMove(cards, fromIndex, toIndex);
+        };
+        
+        const onDragStart = (event) => {
+            if (event.active.data.current?.type === 'Card') {
+                setActiveCard(event.active.data.current.card);
+            }
+        };
+        
+        const onDragOver = (event) => {
+            const { active, over } = event;
+            if (!over) return;
+        
+            const activeId = active.id;
+            const overId = over.id;
+        
+            const isActiveACard = active.data.current?.type === 'Card';
+            const isOverACard = over.data.current?.type === 'Card';
+            const isOverAStatus = over.data.current?.type === 'Status';
+        
+            if (isActiveACard) {
+                setCards((prevCards) => {
+                    const activeIndex = prevCards.findIndex((card) => card.id === activeId);
+        
+                    // Perbarui status kartu jika berpindah antar status
+                    if (isOverACard) {
+                        const overIndex = prevCards.findIndex((card) => card.id === overId);
+                        const targetStatus = prevCards[overIndex]?.status;
+        
+                        if (prevCards[activeIndex].status !== targetStatus) {
+                            const updatedCards = updateCardStatus(prevCards, activeId, targetStatus);
+                            return moveCardPosition(updatedCards, activeIndex, overIndex);
+                        }
+        
+                        return moveCardPosition(prevCards, activeIndex, overIndex);
+                    }
+        
+                    if (isOverAStatus) {
+                        const updatedCards = updateCardStatus(prevCards, activeId, overId);
+                        return moveCardPosition(updatedCards, activeIndex, activeIndex);
+                    }
+        
+                    return prevCards;
+                });
+        
+                // Panggil handleReorderCard setelah pembaruan state
+                handleReorderCard(active, over);
+            }
+        };
+        
+        const onDragEnd = (event) => {
+            const { active, over } = event;
+            if (!over) return;
+        
+            const activeId = active.id;
+            const overId = over.id;
+        
+            const isActiveACard = active.data.current?.type === 'Card';
+            const isOverACard = over.data.current?.type === 'Card';
+            const isOverAStatus = over.data.current?.type === 'Status';
+        
+            if (isActiveACard) {
+                setCards((prevCards) => {
+                    const activeIndex = prevCards.findIndex((card) => card.id === activeId);
+        
+                    if (isOverACard) {
+                        const overIndex = prevCards.findIndex((card) => card.id === overId);
+                        return moveCardPosition(prevCards, activeIndex, overIndex);
+                    }
+        
+                    if (isOverAStatus) {
+                        const updatedCards = updateCardStatus(prevCards, activeId, overId);
+                        return moveCardPosition(updatedCards, activeIndex, activeIndex);
+                    }
+        
+                    return prevCards;
+                });
+            }
+        };
+        
     
 
     return (
