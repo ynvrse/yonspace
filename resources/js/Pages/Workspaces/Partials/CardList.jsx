@@ -3,7 +3,7 @@ import GetPriorityBadge from '@/Components/GetPriorityBadge';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import { Card, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,6 +13,7 @@ import {
 
 import { Link } from '@inertiajs/react';
 import { Edit, Ellipsis, Trash2 } from 'lucide-react';
+import GetPriorityHeaderCard from '@/Components/GetPriorityHeaderCard';
 
 export default function CardList({ card, workspace, handleDeleteCard }) {
     const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
@@ -28,7 +29,17 @@ export default function CardList({ card, workspace, handleDeleteCard }) {
         transform: CSS.Transform.toString(transform),
     };
 
-    
+    if (isDragging) {
+        return (
+            <Card
+                ref={setNodeRef}
+                style={style}
+                {...attributes}
+                {...listeners}
+                className="h-[120px] min-h-[120px] animate-[shake_0.3s_ease-in-out_infinite] cursor-grabbing bg-gray-400 opacity-30"
+            ></Card>
+        );
+    }
 
     return (
         <Card
@@ -36,15 +47,16 @@ export default function CardList({ card, workspace, handleDeleteCard }) {
             style={style}
             {...attributes}
             {...listeners}
-
-            className={`task relative ${isDragging && 'cursor-grabbing  opacity-30 animate-[shake_0.3s_ease-in-out_infinite]'} cursor-grab rounded-xl hover:ring-2 hover:ring-inset hover:ring-lime-400`}
-
+            className="task relative cursor-grab rounded-xl hover:ring-2 hover:ring-inset hover:ring-lime-400"
         >
-            <CardHeader>
+    
+            <GetPriorityHeaderCard priority={card.priority} />
+            <CardContent >
+
                 <div className="flex items-center justify-between">
                     <CardTitle className="line-clamp-2 text-base leading-relaxed tracking-tighter">
                         <Link href={route('cards.show', [workspace, card])} className="hover:text-lime-500">
-                            {card.title} 
+                            {card.title}
                         </Link>
                     </CardTitle>
                     <DropdownMenu>
@@ -75,12 +87,12 @@ export default function CardList({ card, workspace, handleDeleteCard }) {
                     </DropdownMenu>
                 </div>
                 <div>
-                    <GetPriorityBadge priority={card.priority} />
+                    {/* <GetPriorityBadge priority={card.priority} /> */}
                 </div>
                 <CardDescription className="line-clamp-4 leading-relaxed tracking-tighter">
                     {card.description}
                 </CardDescription>
-            </CardHeader>
+            </CardContent>
         </Card>
     );
 }

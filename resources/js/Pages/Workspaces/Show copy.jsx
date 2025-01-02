@@ -5,7 +5,7 @@ import { CardTitle } from '@/Components/ui/card';
 import AppLayout from '@/Layouts/AppLayout';
 import { getAvatarFallback, handleFlashMessage } from '@/lib/utils';
 import { DndContext, DragOverlay, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext } from '@dnd-kit/sortable';
+import { SortableContext } from '@dnd-kit/sortable';
 import { Link, router } from '@inertiajs/react';
 import { Settings, UsersRound } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -88,58 +88,71 @@ export default function Show({ ...props }) {
         const activeId = active.id;
         const overId = over.id;
 
-        if (activeId === overId) return;
-
         const isActiveACard = active.data.current?.type === 'Card';
         const isOverACard = over.data.current?.type === 'Card';
         const isOverAStatus = over.data.current?.type === 'Status';
 
-        if (!isActiveACard) return;
+        if (isActiveACard) {
+            setCards((prevCards) => {
+                const activeIndex = prevCards.findIndex((card) => card.id === activeId);
+                const activeCard = prevCards[activeIndex];
 
-        if (isActiveACard && isOverACard) {
-            setCards((cards) => {
-                const activeIndex = cards.findIndex((card) => card.id === activeId);
-                const overIndex = cards.findIndex((card) => card.id === overId);
+                if (activeId === overId) {
+                    return prevCards;
+                }
 
-                return arrayMove(cards, activeIndex, overIndex);
+                if (isOverACard) {
+                    const overIndex = prevCards.findIndex((card) => card.id === overId);
+                    const overCard = prevCards[overIndex];
+
+                    if (activeIndex === overIndex) {
+                        return prevCards;
+                    }
+
+                    const newCards = [...prevCards];
+                    newCards.splice(activeIndex, 1);
+                    newCards.splice(overIndex, 0, activeCard);
+
+                    return newCards;
+                }
+
+                if (isOverAStatus) {
+                    const newStatus = overId;
+                    if (activeCard.status === newStatus) {
+                        return prevCards;
+                    }
+
+                    const newCards = prevCards.map((card) =>
+                        card.id === activeId ? { ...card, status: newStatus } : card,
+                    );
+
+                    return newCards;
+                }
+
+                return prevCards;
             });
-        }
-
-        if (isActiveACard && isOverAStatus) {
-            setCards((cards) => {
-                const activeIndex = cards.findIndex((card) => card.id === activeId);
-                cards[activeIndex].status = overId;
-                return arrayMove(cards, activeIndex, activeIndex);
-            });
-        }
-
-        if (isActiveACard && (isOverACard || isOverAStatus)) {
-            setTimeout(() => {
-                handleReorderCard(active, over);
-            }, 500);
         }
     };
 
     const onDragEnd = (event) => {
-        setActiveCard(null);
-        setActiveStatus(null);
-
         const { active, over } = event;
         if (!over) return;
 
         const activeId = active.id;
         const overId = over.id;
 
-        if (activeId === overId) return;
+        const isActiveACard = active.data.current?.type === 'Card';
+        const isOverACard = over.data.current?.type === 'Card';
+        const isOverAStatus = over.data.current?.type === 'Status';
 
-        const isActiveStatus = active.data.current?.type === 'Status';
-        if (!isActiveStatus) return;
+        if (isActiveACard && (isOverACard || isOverAStatus)) {
+            if (activeId !== overId) {
+                handleReorderCard(active, over);
+            }
+        }
+        // handleReorderCard(active, over);
 
-        setStatuses((statuses) => {
-            const activeStatusIndex = statuses.findIndex((status) => status.value == activeId);
-            const overStatusIndex = statuses.findIndex((status) => status.value == overId);
-            return arrayMove(statuses, activeStatusIndex, overStatusIndex);
-        });
+        setActiveCard(null);
     };
 
     return (

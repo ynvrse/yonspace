@@ -16,6 +16,7 @@ class CardSingleResource extends JsonResource
     public function toArray(Request $request): array
     {
 
+
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
@@ -33,6 +34,8 @@ class CardSingleResource extends JsonResource
             'created_at' => Carbon::parse($this->created_at),
             'members' => MemberResource::collection($this->members),
             'members_count' => $this->members_count,
+            'attachments' => $this->attachments,
+            'has_attachment' => $this->attachments()->exists(),
         ];
     }
 }

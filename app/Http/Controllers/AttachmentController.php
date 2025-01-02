@@ -15,13 +15,13 @@ class AttachmentController extends Controller
     public function store(Card $card, AttachmentRequest $request): RedirectResponse
     {
 
-        // $request->user()->attachments()->create([
-        //     'card_id' => $card->id,
-        //     'file' => $this->upload_file($request, 'file', 'attachments'),
-        //     'link' => $request->link,
-        //     'name' => $request->name,
+        $request->user()->attachments()->create([
+            'card_id' => $card->id,
+            'file' => $this->upload_file($request, 'file', 'attachments'),
+            'link' => $request->link,
+            'name' => $request->name,
 
-        // ]);
+        ]);
         flashMessage("Attachment was save successfully");
 
         return back();

@@ -20,12 +20,7 @@ export default function StatusList({ status, cards, workspace, handleDeleteCard 
 
     const cardsComponents = useMemo(() => {
         return cards.map((card) => (
-            <CardList
-                key={card.id}
-                card={card}
-                workspace={workspace}
-                handleDeleteCard={handleDeleteCard}
-            />
+            <CardList key={card.id} card={card} workspace={workspace} handleDeleteCard={handleDeleteCard} />
         ));
     }, [cards, workspace, handleDeleteCard]);
 
@@ -33,12 +28,12 @@ export default function StatusList({ status, cards, workspace, handleDeleteCard 
         <div
             ref={setNodeRef}
             style={style}
-            className="sortable-item w-full space-y-4 rounded-lg border shadow-md sm:w-1/4 "
+            {...attributes}
+            {...listeners}
+            className="sortable-item w-full space-y-4 rounded-lg border shadow-md sm:w-1/4"
         >
             <div className="mt-2 flex items-center justify-between px-2">
-                <span className="text-base font-semibold leading-relaxed tracking-tighter">
-                    {status.value}
-                </span>
+                <span className="text-base font-semibold leading-relaxed tracking-tighter">{status.value}</span>
                 <div className="flex items-center gap-x-3">
                     <Link
                         href={route('cards.create', {
@@ -59,4 +54,3 @@ export default function StatusList({ status, cards, workspace, handleDeleteCard 
         </div>
     );
 }
-

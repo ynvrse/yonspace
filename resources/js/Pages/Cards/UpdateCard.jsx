@@ -54,8 +54,8 @@ export default function UpdateCard({ page_settings, status, statuses, priorities
                                     value={data.title}
                                     isFocused={true}
                                     onChange={onHandleChange}
-                                    onErrors={errors.title && <InputError message={errors.title} />}
                                 />
+                                {errors.title && <InputError message={errors.title} />}
                             </div>
                             <div className="col-span-full">
                                 <InputLabel htmlFor="description" value="Description" />
@@ -65,8 +65,8 @@ export default function UpdateCard({ page_settings, status, statuses, priorities
                                     id="description"
                                     value={data.description}
                                     onChange={onHandleChange}
-                                    onErrors={errors.description && <InputError message={errors.description} />}
                                 />
+                                {errors.description && <InputError message={errors.description} />}
                             </div>
                             <div className="col-span-full">
                                 <InputLabel htmlFor="deadline" value="Deadline" />
@@ -76,8 +76,9 @@ export default function UpdateCard({ page_settings, status, statuses, priorities
                                     id="deadline"
                                     value={data.deadline}
                                     onChange={onHandleChange}
-                                    onErrors={errors.deadline && <InputError message={errors.deadline} />}
                                 />
+
+                                {errors.deadline && <InputError message={errors.deadline} />}
                             </div>
 
                             <div className="col-span-full">

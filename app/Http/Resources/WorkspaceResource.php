@@ -33,8 +33,8 @@ class WorkspaceResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
-            // 'logo' => env('APP_URL') . Storage::url($this->logo),
-            'cover' => env('APP_URL') . Storage::url($this->cover),
+            'logo' =>  Storage::url($this->logo),
+            'cover' =>  Storage::url($this->cover),
             'visibility' => $this->visibility->value,
             'members' => $membersData,
         ];
